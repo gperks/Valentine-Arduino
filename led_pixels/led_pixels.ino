@@ -17,14 +17,15 @@
 uint8_t dataPin  = 2;    // Yellow wire on Adafruit Pixels
 uint8_t clockPin = 3;    // Green wire on Adafruit Pixels
 
-#define GRIDSIZE 5
+#define GRIDSIZE 5 // We have a 5x5 LED array
+
 
 unsigned long previousMillis = 0;
 unsigned long frameDelayMillis = 5; // time between frames
 
 // Set the first variable to the NUMBER of pixels.
-Adafruit_WS2801 strip = Adafruit_WS2801(25, dataPin, clockPin);
-LEDFader Fader(strip, 5, 5);
+Adafruit_WS2801 strip = Adafruit_WS2801(GRIDSIZE*GRIDSIZE, dataPin, clockPin);
+LEDFader Fader(strip, GRIDSIZE, GRIDSIZE);
 
 typedef void (*AnimationEndedCallback)();
 typedef void (*CurrentAnimationFP)(unsigned long);
@@ -35,22 +36,13 @@ double transitionDuration; // in millis
 AnimationEndedCallback transitionCompleteCallback;
 double transitionElapsed; // millis taken by transition so far
 
-void renderColors(unsigned long delta)
-{
-  if (transitionElapsed < transitionDuration) {
-    transitionElapsed += delta;
-  }
-  else {
-    transitionCompleteCallback();
-  }
-}
+
 /**
  Transition to a frame of colors.
  @param duration in seconds
  */
-void transitionToFrame(byte* frame, double duration, void (*completionCallback)(), uint32_t color)
+void transitionToFrame(byte* frame, uint32_t color)
 {
-
   for (int y = 0; y < GRIDSIZE; y++) {
     byte b = frame[y];
     for (int x = 0; x < GRIDSIZE; x++) {
@@ -58,26 +50,16 @@ void transitionToFrame(byte* frame, double duration, void (*completionCallback)(
       Fader.setPixelColor(x, y, bit ? color : Color(0, 0, 0), 0.2);
     }
   }
-
-  CurrentAnimation = &renderColors;
-  transitionElapsed = 0;
-  transitionDuration = duration * 1000; // convert to millis
-  transitionCompleteCallback = completionCallback;
 }
 
-void transitionToRedFrame(byte* frame, double duration, void (*completionCallback)())
+void transitionToRedFrame(byte* frame)
 {
-  transitionToFrame(frame, duration, completionCallback, Color(128, 0, 0));
+  transitionToFrame(frame, Color(128, 0, 0));
 }
 
-void transitionToColorFrame(byte* frame, double duration, void (*completionCallback)(), uint32_t color)
+void transitionToColorFrame(byte* frame, uint32_t color)
 {
-  transitionToFrame(frame, duration, completionCallback, color);
-}
-
-void transitionToBlueFrame(byte* frame, double duration, void (*completionCallback)())
-{
-  transitionToFrame(frame, duration, completionCallback, Color(0, 0, 128));
+  transitionToFrame(frame, color);
 }
 
 
@@ -89,9 +71,9 @@ void pause_animation(unsigned long delta)
   if (transitionElapsed < transitionDuration) {
     transitionElapsed += delta;
 
-    // clamp
-    if (transitionElapsed > transitionDuration)
-      transitionElapsed = transitionDuration;
+//    // clamp  - no need in this simple pause.
+//    if (transitionElapsed > transitionDuration)
+//      transitionElapsed = transitionDuration;
   }
   else {
     transitionCompleteCallback();
@@ -195,25 +177,9 @@ void rainbow_animation(unsigned long delta)
 
         uint32_t c = ColorWheel(wheelPos);
 
-//        // Fade in
-//        if (rainbowStyle & RAINBOW_FADE_IN) {
-//          double fadeInTime = 300;
-//          if (transitionElapsed < fadeInTime) {
-//            byte r = (c >> 16) & 0xff;
-//            byte g = (c >> 8) & 0xff;
-//            byte b = c & 0xff;
-//            double factor = transitionElapsed / fadeInTime;
-//
-//            c = Color(r * factor, g * factor, b * factor);
-//          }
-//        }
-
         Fader.setPixelColor(x, y, c, 0.1);
-        //strip.setPixelColor(y * GRIDSIZE + x, c);
       }
     }
-
-    //strip.show();
   }
   else {
     transitionCompleteCallback();
@@ -233,9 +199,9 @@ void rainbow(double duration, void (*completionCallback)(), int style)
 
 ///////
 
-void allOff(double duration, void (*completionCallback)())
+void allOff()
 {
-  transitionToFrame(AllDark, duration, completionCallback, Color(0, 0, 128));
+  transitionToFrame(AllDark, Color(0, 0, 128));
 
   //    for (int y=0;y<GRIDSIZE;y++) {
   //      for (int x=0;x<GRIDSIZE;x++) {
@@ -261,6 +227,7 @@ struct Animation
 };
 
 Animation animations[] = {
+  // Beating heart
   { animateToBigHeart, 0.2 },
   { pause, 3 },
   { animateToSmallHeart, 0.4 },
@@ -270,6 +237,7 @@ Animation animations[] = {
   { animateToSmallHeart, 0.4 },
   { animateToBigHeart, 0.5},
 
+  // "I <heart> U"
   { animateToLetterI, 0.2 },
   { pause, 1.5 },
   { animateToBigHeart, 0.2},
@@ -277,6 +245,7 @@ Animation animations[] = {
   { animateToLetterU, 0.2 },
   { pause, 1.5 },
 
+  // Beating heart
   { animateToBigHeart, 0.5},
   { animateToSmallHeart, 0.4 },
   { animateToBigHeart, 0.5},
@@ -290,6 +259,7 @@ Animation animations[] = {
 //  { allOff, 0.5 },
   { pause, 0.5 },
 
+  // Color swirls
   { rainbowAnimation, 10, 1 },
   { rainbowAnimation, 15, 0 },
 
@@ -333,21 +303,26 @@ void nextAnimation()
 
 void animateToSmallHeart(double duration, uint32_t param)
 {
-  transitionToFrame(SmallHeart, duration, &nextAnimation, Color(200, 0, 0));
+  transitionToFrame(SmallHeart, Color(200, 0, 0));
+  pause(duration, &nextAnimation);
 }
 
 void animateToBigHeart(double duration, uint32_t param)
 {
-  transitionToRedFrame(BigHeart, duration, &nextAnimation);
+  transitionToRedFrame(BigHeart);
+  pause(duration, &nextAnimation);
 }
 
 void animateToLetterI(double duration, uint32_t param)
 {
-  transitionToFrame(FontI, duration, &nextAnimation, Color(0, 0, 150));
+  transitionToFrame(FontI, Color(0, 0, 150));
+  pause(duration, &nextAnimation);
 }
+
 void animateToLetterU(double duration, uint32_t param)
 {
-  transitionToFrame(FontU, duration, &nextAnimation, Color(0, 0, 150));
+  transitionToFrame(FontU, Color(0, 0, 150));
+  pause(duration, &nextAnimation);
 }
 
 void pause(double duration, uint32_t param)
@@ -363,7 +338,8 @@ void rainbowAnimation(double duration, uint32_t param)
 
 void allOff(double duration, uint32_t param)
 {
-  allOff(duration, &nextAnimation);
+  allOff();
+  pause(duration, &nextAnimation);
 }
 
 //////////////
