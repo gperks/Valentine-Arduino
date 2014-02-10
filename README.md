@@ -12,3 +12,8 @@ There's a class (LEDFader) here which wraps the WS2801 library and provides the 
 For the hardware, I followed http://www.instructables.com/id/Yet-Another-Daft-Punk-Coffee-TableDisplay/#step0, though of course I replaced the individual LEDs with the Pixels. I also thickened the box, by 3cm; this added a hidden back area with space for the wiring and arduino.
 
 I ordered a translucent cover from Blick art materials (failed to find anything locally). http://www.dickblick.com/products/grafix-drafting-film/. I found the 2-sided version of this better at hiding the LEDs within, there's more blurring going on.
+
+Photos
+------
+
+![LED array next to Arduino](gperks.github.com/Valentine-Arduino/pics/IMG_3159.jpg)
