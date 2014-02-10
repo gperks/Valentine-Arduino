@@ -16,4 +16,4 @@ I ordered a translucent cover from Blick art materials (failed to find anything 
 Photos
 ------
 
-![LED array next to Arduino](gperks.github.com/Valentine-Arduino/pics/IMG_3159.jpg)
+![LED array next to Arduino](http://gperks.github.com/Valentine-Arduino/pics/IMG_3159.jpg)
