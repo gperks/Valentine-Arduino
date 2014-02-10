@@ -17,3 +17,28 @@ Photos
 ------
 
 ![LED array next to Arduino](http://gperks.github.com/Valentine-Arduino/pics/IMG_3159.jpg)
+
+Here you can see the rear of the array. The Arduino is connected to the array, and the 5V power to both the pixel array and directly to the Arduino's 5V pin. That goes off via a power adapter (http://www.adafruit.com/products/368) to an inline power switch (http://www.adafruit.com/products/1125) and then to a 5V 2A power supply (http://www.adafruit.com/products/276).
+
+![Rear of LED array](http://gperks.github.com/Valentine-Arduino/pics/IMG_3160.jpg)
+
+This shows the box surrounding the pixels. Part way down are the stops where the pixel layer rests, with space beneath for wires & arduino.
+
+![Case](http://gperks.github.com/Valentine-Arduino/pics/IMG_3161.jpg)
+
+![A heart](http://gperks.github.com/Valentine-Arduino/pics/IMG_3164.jpg)
+
+![Blue lights](http://gperks.github.com/Valentine-Arduino/pics/IMG_3162.jpg)
+
+![Rainbow](http://gperks.github.com/Valentine-Arduino/pics/IMG_3165.jpg)
+
+![Rainbow again](http://gperks.github.com/Valentine-Arduino/pics/IMG_3166.jpg)
+
+With the double-sided matte film.
+![Double sided matte](http://gperks.github.com/Valentine-Arduino/pics/IMG_3167.jpg)
+
+With the single-sided matte film.
+![Double sided matte](http://gperks.github.com/Valentine-Arduino/pics/IMG_3168.jpg)
+
+With two layers of single-sided matte film.
+![Double sided matte](http://gperks.github.com/Valentine-Arduino/pics/IMG_3169.jpg)
