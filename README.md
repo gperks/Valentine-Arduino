@@ -5,9 +5,9 @@ For driving an array of LEDs with a Valentine's message.
 
 Currently this is configured for a 5x5 array of pixels.
 
-I used Adafruit's RGB Pixels which have a WS2801 driving them, and a 5V 2A power supply.
+I used Adafruit's RGB Pixels (http://www.adafruit.com/products/322) which have a WS2801 driving them.
 
-There's a class (LEDFader) here which wraps the WS2801 library and provides the ability to animate pixel color changes, which makes for a smoother color flow.
+There's a class (LEDFader) here which wraps the WS2801 library and provides the ability to animate pixel color changes, which makes for a smoother color flow. Rather than the pixel snapping from color to color, you can specify a duration to setPixelColor over which the pixel's color will animate.
 
 For the hardware, I followed http://www.instructables.com/id/Yet-Another-Daft-Punk-Coffee-TableDisplay/#step0, though of course I replaced the individual LEDs with the Pixels. I also thickened the box, by 3cm; this added a hidden back area with space for the wiring and arduino.
 
