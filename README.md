@@ -13,6 +13,10 @@ For the hardware, I followed http://www.instructables.com/id/Yet-Another-Daft-Pu
 
 I ordered a translucent cover from Blick art materials (failed to find anything locally). http://www.dickblick.com/products/grafix-drafting-film/. I found the 2-sided version of this better at hiding the LEDs within, there's more blurring going on.
 
+Video
+-----
+http://vimeo.com/86373164
+
 Photos
 ------
 
