@@ -219,10 +219,22 @@ void allOffBitByBit(double duration)
   for (int y = 0; y < GRIDSIZE; y++) {
     for (int x = 0; x < GRIDSIZE; x++) {
       Fader.setPixelColor(x, y, Color(0, 0, 0), time);
-      time += duration / (GRIDSIZE * GRIDSIZE); // fade over 2s
+      time += duration / (GRIDSIZE * GRIDSIZE); // fade over duration
     }
   }
 }
+
+void allOffRowByRow(double duration)
+{
+  double time = 0.1;
+  for (int y = 0; y < GRIDSIZE; y++) {
+      time += duration / GRIDSIZE;
+    for (int x = 0; x < GRIDSIZE; x++) {
+      Fader.setPixelColor(x, y, Color(0, 0, 0), time);
+    }
+  }
+}
+
 
 /////////////
 
@@ -259,7 +271,7 @@ Animation animations[] = {
   { animateToLetterU, 0.2 },
   { pause, 1.5 },
 
-  { allOffBitByBit, 1 },
+  { allOffRowByRow, 2 },
 
   // Beating heart
   { animateToBigHeart, 0.5},
@@ -277,10 +289,11 @@ Animation animations[] = {
   { pause, 0.5 },
 
   // Color swirls
-  { rainbowAnimation, 1, 1 },
-  { rainbowAnimation, 1, 0 },
+//  { rainbowAnimation, 15, 1 },
+//  { allOffRowByRow, 1 },
+  { rainbowAnimation, 30, 0 },
 
-  { allOffBitByBit, 2 },
+  { allOffRowByRow, 2 },
   //{ pause, 0.5 },
 };
 
@@ -362,6 +375,12 @@ void allOff(double duration, uint32_t param)
 void allOffBitByBit(double duration, uint32_t param)
 {
   allOffBitByBit(duration);
+  pause(duration, &nextAnimation);
+}
+
+void allOffRowByRow(double duration, uint32_t param)
+{
+  allOffRowByRow(duration);
   pause(duration, &nextAnimation);
 }
 
