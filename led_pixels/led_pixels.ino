@@ -71,9 +71,9 @@ void pause_animation(unsigned long delta)
   if (transitionElapsed < transitionDuration) {
     transitionElapsed += delta;
 
-//    // clamp  - no need in this simple pause.
-//    if (transitionElapsed > transitionDuration)
-//      transitionElapsed = transitionDuration;
+    //    // clamp  - no need in this simple pause.
+    //    if (transitionElapsed > transitionDuration)
+    //      transitionElapsed = transitionDuration;
   }
   else {
     transitionCompleteCallback();
@@ -212,6 +212,18 @@ void allOff()
   //    strip.show();
 }
 
+
+void allOffBitByBit(double duration)
+{
+  double time = 0;
+  for (int y = 0; y < GRIDSIZE; y++) {
+    for (int x = 0; x < GRIDSIZE; x++) {
+      Fader.setPixelColor(x, y, Color(0, 0, 0), time);
+      time += duration / (GRIDSIZE * GRIDSIZE); // fade over 2s
+    }
+  }
+}
+
 /////////////
 
 
@@ -237,6 +249,8 @@ Animation animations[] = {
   { animateToSmallHeart, 0.4 },
   { animateToBigHeart, 0.5},
 
+  { allOffBitByBit, 1 },
+
   // "I <heart> U"
   { animateToLetterI, 0.2 },
   { pause, 1.5 },
@@ -244,6 +258,8 @@ Animation animations[] = {
   { pause, 1 },
   { animateToLetterU, 0.2 },
   { pause, 1.5 },
+
+  { allOffBitByBit, 1 },
 
   // Beating heart
   { animateToBigHeart, 0.5},
@@ -256,14 +272,15 @@ Animation animations[] = {
   { animateToSmallHeart, 0.4 },
   { animateToBigHeart, 0.5},
 
+  { allOffBitByBit, 2 },
 //  { allOff, 0.5 },
   { pause, 0.5 },
 
   // Color swirls
-  { rainbowAnimation, 10, 1 },
-  { rainbowAnimation, 15, 0 },
+  { rainbowAnimation, 1, 1 },
+  { rainbowAnimation, 1, 0 },
 
-  { allOff, 0.5 },
+  { allOffBitByBit, 2 },
   //{ pause, 0.5 },
 };
 
@@ -274,10 +291,10 @@ void setup() {
   // Update LED contents, to start they are all 'off'
   strip.show();
 
-//  Serial.begin(19200);
-//  while (!Serial) {
-//    ; // wait for serial port to connect. Needed for Leonardo only
-//  }
+  //  Serial.begin(19200);
+  //  while (!Serial) {
+  //    ; // wait for serial port to connect. Needed for Leonardo only
+  //  }
 
 
   animationFrame = 0;
@@ -287,9 +304,9 @@ void setup() {
 // Starts the next animation.
 void nextAnimation()
 {
-//  Serial.print("Proceeding to animation: ");
-//  Serial.println(animationFrame);
-//  
+  //  Serial.print("Proceeding to animation: ");
+  //  Serial.println(animationFrame);
+  //
   // Fetch the current animation, invoke it.
   Animation a = animations[animationFrame++];
   a.func(a.duration, a.param);
@@ -339,6 +356,12 @@ void rainbowAnimation(double duration, uint32_t param)
 void allOff(double duration, uint32_t param)
 {
   allOff();
+  pause(duration, &nextAnimation);
+}
+
+void allOffBitByBit(double duration, uint32_t param)
+{
+  allOffBitByBit(duration);
   pause(duration, &nextAnimation);
 }
 

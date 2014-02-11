@@ -2,7 +2,6 @@
 
 LEDFader::LEDFader(Adafruit_WS2801 &strip, int GridWidth, int GridHeight) 
 : _strip(strip)
-
 {
   _gridWidth = GridWidth;
   _gridHeight = GridHeight;
@@ -63,6 +62,11 @@ void LEDFader::loop(unsigned long delta)
         byte newB = b + ((targetB - b) * factor);
   
         _strip.setPixelColor(pixel, Color(newR, newG, newB));
+      }
+      else if ((_transitionDuration[pixel] == 0) && (_transitionElapsed[pixel] == 0)) {
+        // No duration specified. Jump to target color immediately.
+        _strip.setPixelColor(pixel, _targetColors[pixel]);
+        _transitionElapsed[pixel] = 1; // so we don't try to set the color here again.
       }
     }
   }
