@@ -34,7 +34,8 @@ class LEDFader : public Actor
     // TargetColors: the colors the LEDs are to end up in at the transition's end
     // transitionDuration: the desired duration of the transition
     
-
+    int pixelFromCoords(int x, int y);
+    
     uint32_t *_targetColors; // Per pixel
     uint32_t *_startColors; // Per pixel, the colors at the animation's start.
     double *_transitionDuration; // Per pixel, in millis

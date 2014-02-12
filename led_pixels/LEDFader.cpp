@@ -20,9 +20,23 @@ LEDFader::~LEDFader()
   free(_targetColors);
 }
 
+// Our pixels are not laid out in a nice x,y system. Row 0 goes up, row 1 goes down, etc.
+// Plus I wanted the image rotated to have my wires coming out the box's bottom.
+// This function maps from x,y to the pixel number in the LED strip.
+int LEDFader::pixelFromCoords(int x, int y)
+{
+  int mapX = _gridWidth - x - 1;
+  int mapY = _gridHeight - y - 1;
+  int colStart = _gridHeight * mapX;
+  
+  int pixel = (mapX % 2)==0 ? (colStart + mapY) : (colStart + ( _gridHeight - mapY - 1));
+  return pixel;
+}
+
+
 void LEDFader::setPixelColor(int x, int y, uint32_t color, double duration)
 {
-  int pixel = y * _gridWidth + x;
+  int pixel = pixelFromCoords(x, y);
   _startColors[pixel] = _strip.getPixelColor(pixel);
   _targetColors[pixel] = color;
   _transitionDuration[pixel] = duration * 1000; // convert to millis
@@ -34,7 +48,8 @@ void LEDFader::loop(unsigned long delta)
 {
   for (int y = 0; y < _gridHeight; y++) {
     for (int x = 0; x < _gridWidth; x++) {
-      int pixel = y * _gridWidth + x;
+      
+      int pixel = pixelFromCoords(x, y);
       
       if (_transitionElapsed[pixel] < _transitionDuration[pixel]) {
         _transitionElapsed[pixel] += delta;
