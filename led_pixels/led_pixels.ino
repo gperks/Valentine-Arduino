@@ -4,6 +4,7 @@
 
 #include "frames.h"
 #include "LEDFader.h"
+#include "Rainbow.h"
 
 /**
 
@@ -26,6 +27,8 @@ unsigned long frameDelayMillis = 5; // time between frames
 // Set the first variable to the NUMBER of pixels.
 Adafruit_WS2801 strip = Adafruit_WS2801(GRIDSIZE*GRIDSIZE, dataPin, clockPin);
 LEDFader Fader(strip, GRIDSIZE, GRIDSIZE);
+
+Actor *CurrentActor;
 
 typedef void (*AnimationEndedCallback)();
 typedef void (*CurrentAnimationFP)(unsigned long);
@@ -89,113 +92,6 @@ void pause(double duration, void (*completionCallback)())
   transitionCompleteCallback = completionCallback;
 }
 
-////////////
-// Swirl a rainbow animation
-
-// Color wheel yellow->red->blue->green
-// Wheel from http://blog.asmartbear.com/color-wheels.html
-// wheelPos: ranges 0..1
-uint32_t ColorWheel(double wheelPos)
-{
-  const double MaxBrightness = 100;
-  byte r, g, b;
-  if (wheelPos < 0) {
-    // Shouldn't get here
-    Serial.println("wheelPos < 0");
-    r = g = b = 0;
-  }
-  else if (wheelPos < 0.25) {
-    // Yellow to red
-    double factor = MaxBrightness * 4 * wheelPos;
-    r = MaxBrightness;
-    g = MaxBrightness - factor;
-    b = 0;
-  }
-  else if (wheelPos < 0.5) {
-    // Red to Blue
-    double factor = MaxBrightness * 4 * (wheelPos - 0.25);
-    r = MaxBrightness - factor;
-    g = 0;
-    b = factor;
-  }
-  else if (wheelPos < 0.75) {
-    // Blue to green
-    double factor = MaxBrightness * 4 * (wheelPos - 0.5);
-    r = 0;
-    g = factor;
-    b = MaxBrightness - factor;
-  }
-  else if (wheelPos <= 1) {
-    // Green to yellow
-    double factor = MaxBrightness * 4 * (wheelPos - 0.75);
-    r = factor;
-    g = MaxBrightness;
-    b = 0;
-  }
-  else {
-    // Shouldn't get here
-    Serial.println("wheelPos > 1");
-    r = g = b = 0;
-  }
-
-  //  char buf[100];
-  //  char fbuf[20];
-  //  dtostrf(wheelPos, 5, 2, fbuf);
-  //  sprintf(buf, "%s: %d, %d, %d", fbuf, (int)r, (int)g, (int)b);
-  //  Serial.println(buf);
-
-
-  return Color(r, g, b);
-}
-
-#define RAINBOW_FADE_IN (1 << 16)
-#define RAINBOW_STYLE 0xff
-int rainbowStyle;
-
-void rainbow_animation(unsigned long delta)
-{
-  if (transitionElapsed < transitionDuration) {
-    transitionElapsed += delta;
-
-    // clamp
-    if (transitionElapsed > transitionDuration) {
-      transitionElapsed = transitionDuration;
-    }
-
-    const int rainbowSize = 10000; // number of milliseconds rainbow unfolds over
-    const double rainbowLength = (rainbowStyle & RAINBOW_STYLE) ? 0 : 0.3; // How far across time the last pixel is from the first.
-    double frame = (long)transitionElapsed % rainbowSize;
-
-    for (int y = 0; y < GRIDSIZE; y++) {
-      for (int x = 0; x < GRIDSIZE; x++) {
-
-        double wheelPos = frame / rainbowSize;
-        double tail = rainbowLength * ((double)(y * GRIDSIZE + x) / (double)(GRIDSIZE * GRIDSIZE));
-        wheelPos += tail;
-        if (wheelPos > 1)
-          wheelPos -= 1;
-
-        uint32_t c = ColorWheel(wheelPos);
-
-        Fader.setPixelColor(x, y, c, 0.1);
-      }
-    }
-  }
-  else {
-    transitionCompleteCallback();
-  }
-}
-
-// duration in seconds
-void rainbow(double duration, void (*completionCallback)(), int style)
-{
-  // Configure the rainbow
-  CurrentAnimation = &rainbow_animation;
-  transitionElapsed = 0;
-  transitionDuration = duration * 1000; // convert to millis
-  transitionCompleteCallback = completionCallback;
-  rainbowStyle = style;
-}
 
 ///////
 
@@ -291,7 +187,7 @@ Animation animations[] = {
   // Color swirls
 //  { rainbowAnimation, 15, 1 },
 //  { allOffRowByRow, 1 },
-  { rainbowAnimation, 30, 0 },
+  { rainbowAnimation, 3, 0 },
 
   { allOffRowByRow, 2 },
   //{ pause, 0.5 },
@@ -304,10 +200,10 @@ void setup() {
   // Update LED contents, to start they are all 'off'
   strip.show();
 
-  //  Serial.begin(19200);
-  //  while (!Serial) {
-  //    ; // wait for serial port to connect. Needed for Leonardo only
-  //  }
+//  Serial.begin(19200);
+//  while (!Serial) {
+//    ; // wait for serial port to connect. Needed for Leonardo only
+//  }
 
 
   animationFrame = 0;
@@ -363,7 +259,9 @@ void pause(double duration, uint32_t param)
 void rainbowAnimation(double duration, uint32_t param)
 {
   int style = param;
-  rainbow(duration, &nextAnimation, style);
+  Rainbow *bow = new Rainbow(Fader, duration, style);
+  CurrentActor = bow;
+  //rainbow(duration, &nextAnimation, style);
 }
 
 void allOff(double duration, uint32_t param)
@@ -394,8 +292,18 @@ void loop() {
 
   if (delta > frameDelayMillis) {
     previousMillis = currentMillis;
-    Fader.loop(delta);
-    CurrentAnimation(delta);
+    Fader.loop(delta); // render frame to leds
+    if (CurrentActor) {
+      bool rc = CurrentActor->loop(delta);
+      // actor completed?
+      if (rc) {
+        delete CurrentActor;
+        CurrentActor = 0;
+        nextAnimation();
+      }
+    }
+    else 
+      CurrentAnimation(delta); // create next frame
   }
 }
 

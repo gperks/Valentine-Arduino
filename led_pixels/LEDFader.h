@@ -1,8 +1,6 @@
 #ifndef _LEDFADER_H_
 #define _LEDFADER_H_
 
-#include "Actor.h"
-
 #ifndef WS2801_GRB
 #include "SPI.h"
 #include "Adafruit_WS2801.h"
@@ -13,22 +11,25 @@
 uint32_t Color(byte r, byte g, byte b);
 
 // Transitions between the current LED state and the desired color.
-class LEDFader : public Actor
+class LEDFader
 {
   public:
     LEDFader(Adafruit_WS2801 &strip, int GridWidth, int GridHeight);
     ~LEDFader();
-    virtual void loop(unsigned long delta);
+    void loop(unsigned long delta);
     
     /**
      @param duration Fade time in seconds.
      */
     void setPixelColor(int x, int y, uint32_t color, double duration);
+
+    int gridWidth() const {return _gridWidth; }
+    int gridHeight() const {return _gridHeight; }
     
   private:
+    Adafruit_WS2801 &_strip;
     int _gridWidth;
     int _gridHeight;
-    Adafruit_WS2801 &_strip;
     
     // Render colors
     // TargetColors: the colors the LEDs are to end up in at the transition's end
