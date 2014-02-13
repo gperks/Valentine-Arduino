@@ -4,7 +4,9 @@
 
 #include "frames.h"
 #include "LEDFader.h"
+#include "Pause.h"
 #include "Rainbow.h"
+
 
 /**
 
@@ -64,34 +66,6 @@ void transitionToColorFrame(byte* frame, uint32_t color)
 {
   transitionToFrame(frame, color);
 }
-
-
-////////////
-// Pause animation
-
-void pause_animation(unsigned long delta)
-{
-  if (transitionElapsed < transitionDuration) {
-    transitionElapsed += delta;
-
-    //    // clamp  - no need in this simple pause.
-    //    if (transitionElapsed > transitionDuration)
-    //      transitionElapsed = transitionDuration;
-  }
-  else {
-    transitionCompleteCallback();
-  }
-}
-
-// duration in seconds
-void pause(double duration, void (*completionCallback)())
-{
-  CurrentAnimation = &pause_animation;
-  transitionElapsed = 0;
-  transitionDuration = duration * 1000; // convert to millis
-  transitionCompleteCallback = completionCallback;
-}
-
 
 ///////
 
@@ -227,33 +201,39 @@ void nextAnimation()
   }
 }
 
+// Helper function as so many things include a pause.
+void pause(double duration)
+{
+  CurrentActor = new Pause(Fader, duration);
+}
+
 void animateToSmallHeart(double duration, uint32_t param)
 {
   transitionToFrame(SmallHeart, Color(200, 0, 0));
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 void animateToBigHeart(double duration, uint32_t param)
 {
   transitionToRedFrame(BigHeart);
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 void animateToLetterI(double duration, uint32_t param)
 {
   transitionToFrame(FontI, Color(0, 0, 150));
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 void animateToLetterU(double duration, uint32_t param)
 {
   transitionToFrame(FontU, Color(0, 0, 150));
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 void pause(double duration, uint32_t param)
 {
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 void rainbowAnimation(double duration, uint32_t param)
@@ -261,25 +241,24 @@ void rainbowAnimation(double duration, uint32_t param)
   int style = param;
   Rainbow *bow = new Rainbow(Fader, duration, style);
   CurrentActor = bow;
-  //rainbow(duration, &nextAnimation, style);
 }
 
 void allOff(double duration, uint32_t param)
 {
   allOff();
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 void allOffBitByBit(double duration, uint32_t param)
 {
   allOffBitByBit(duration);
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 void allOffRowByRow(double duration, uint32_t param)
 {
   allOffRowByRow(duration);
-  pause(duration, &nextAnimation);
+  pause(duration);
 }
 
 //////////////
