@@ -135,36 +135,36 @@ struct Animation
 Animation animations[] = {
   // Beating heart
   { animateToBigHeart, 0.2 },
-//  { pause, 3 },
-//  { animateToSmallHeart, 0.4 },
-//  { animateToBigHeart, 0.5},
-//  { animateToSmallHeart, 0.4 },
-//  { animateToBigHeart, 0.5},
-//  { animateToSmallHeart, 0.4 },
-//  { animateToBigHeart, 0.5},
-//
-//  { allOffBitByBit, 1 },
-//
-//  // "I <heart> U"
-//  { animateToLetterI, 0.2 },
-//  { pause, 1.5 },
-//  { animateToBigHeart, 0.2},
-//  { pause, 1 },
-//  { animateToLetterU, 0.2 },
-//  { pause, 1.5 },
-//
-//  { allOffRowByRow, 2 },
-//
-//  // Beating heart
-//  { animateToBigHeart, 0.5},
-//  { animateToSmallHeart, 0.4 },
-//  { animateToBigHeart, 0.5},
-//  { animateToSmallHeart, 0.4 },
-//  { animateToBigHeart, 0.5},
-//  { animateToSmallHeart, 0.4 },
-//  { animateToBigHeart, 0.5},
-//  { animateToSmallHeart, 0.4 },
-//  { animateToBigHeart, 0.5},
+  { pause, 3 },
+  { animateToSmallHeart, 0.4 },
+  { animateToBigHeart, 0.5},
+  { animateToSmallHeart, 0.4 },
+  { animateToBigHeart, 0.5},
+  { animateToSmallHeart, 0.4 },
+  { animateToBigHeart, 0.5},
+
+  { allOffBitByBit, 1 },
+
+  // "I <heart> U"
+  { animateToLetterI, 0.2 },
+  { pause, 1.5 },
+  { animateToBigHeart, 0.2},
+  { pause, 1 },
+  { animateToLetterU, 0.2 },
+  { pause, 1.5 },
+
+  { allOffRowByRow, 2 },
+
+  // Beating heart
+  { animateToBigHeart, 0.5},
+  { animateToSmallHeart, 0.4 },
+  { animateToBigHeart, 0.5},
+  { animateToSmallHeart, 0.4 },
+  { animateToBigHeart, 0.5},
+  { animateToSmallHeart, 0.4 },
+  { animateToBigHeart, 0.5},
+  { animateToSmallHeart, 0.4 },
+  { animateToBigHeart, 0.5},
 
   { beMineMessage },
 
@@ -173,9 +173,9 @@ Animation animations[] = {
   { pause, 0.5 },
 
   // Color swirls
-//  { rainbowAnimation, 15, 1 },
+  { rainbowAnimation, 15, 1 },
 //  { allOffRowByRow, 1 },
-  { rainbowAnimation, 3, 0 },
+  { rainbowAnimation, 60, 0 },
 
   { allOffRowByRow, 2 },
   //{ pause, 0.5 },
@@ -276,7 +276,7 @@ void allOffRowByRow(double duration, uint32_t param)
 
 void beMineMessage(double duration, uint32_t param)
 {
-  Message *msg = new Message(Fader, " BE MY VALENTINE");
+  Message *msg = new Message(Fader, "   BE MY VALENTINE");
   CurrentActor = msg;
 }
 

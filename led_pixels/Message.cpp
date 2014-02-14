@@ -1,6 +1,7 @@
 #include "Message.h"
 
-byte* alphabetFrameFromChar(char letter);
+extern byte* alphabetFrameFromChar(char letter);
+extern uint32_t ColorWheel(double wheelPos);
 
 Message::Message(LEDFader &fader, const char *message)
   : Actor(fader, 0)
@@ -9,10 +10,11 @@ Message::Message(LEDFader &fader, const char *message)
   , _scrollIndex(0)
   , _pausing(false)
   , _blur(0.05)
-  , _speedDelay(150)
+  , _speedDelay(200)
+  , _wheelPos(0)
 {
   _messageLen = strlen(message);
-  _black = Color(0, 0, 0);
+  _black = Color(10, 0, 0);
   //_fader._logging = true;
 }
 
@@ -33,7 +35,12 @@ void Message::setColumnBlack(int x)
 // @param charX the column within the frame
 void Message::setColumnFromFrame(byte *frame, int x, int charX)
 {
-  uint32_t color = Color(50, 75, 0);
+  double wheelPos = _wheelPos + ((x-2)*.01);
+  if (wheelPos < 0)
+    wheelPos += 1;
+  else if (wheelPos > 1)
+    wheelPos -= 1;
+  uint32_t color = ColorWheel(wheelPos);
 
   charX = 4 - charX;
   for (int y = 0; y < _fader.gridHeight(); y++) {
@@ -87,7 +94,11 @@ bool Message::loop(unsigned long delta)
   else if (_scrollIndex > 0) {
     // Scroll one pixel
     _scrollIndex--;
-
+    
+    _wheelPos += 0.02;
+    if (_wheelPos > 1)
+      _wheelPos = 0;
+      
     updateLEDs();
 
     _pausing = true;
@@ -98,7 +109,9 @@ bool Message::loop(unsigned long delta)
     // Onto next letter
     _scrollIndex = _fader.gridWidth() + 1; // +1 for space between chars
     _currentCharIndex++;
+    
 
+      
     return false;
   }
   else {

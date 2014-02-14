@@ -1,6 +1,6 @@
 #include "Rainbow.h"
 
-static uint32_t ColorWheel(double wheelPos);
+uint32_t ColorWheel(double wheelPos);
 
 Rainbow::Rainbow(LEDFader &fader, double duration, int rainbowStyle) 
 : Actor(fader, duration)
@@ -53,7 +53,7 @@ bool Rainbow::loop(unsigned long delta)
 // Color wheel yellow->red->blue->green
 // Wheel from http://blog.asmartbear.com/color-wheels.html
 // wheelPos: ranges 0..1
-static uint32_t ColorWheel(double wheelPos)
+uint32_t ColorWheel(double wheelPos)
 {
   const double MaxBrightness = 100;
   byte r, g, b;

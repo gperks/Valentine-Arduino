@@ -19,6 +19,7 @@ class Message : public Actor
     uint32_t _black;
     double _blur; // how fast the LEDs fade
     double _speedDelay; // in milliseconds, delay between frames
+    double _wheelPos; // color wheel
     
     void updateLEDs();
     void setColumnBlack(int x);
