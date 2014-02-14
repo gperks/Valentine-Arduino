@@ -17,8 +17,6 @@ class Actor
     double _transitionDuration; // in millis
     double _transitionElapsed; // millis taken by transition so far
     
-    int _gridWidth;
-    int _gridHeight;
 };
 
 #endif

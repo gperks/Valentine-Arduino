@@ -10,6 +10,7 @@ LEDFader::LEDFader(Adafruit_WS2801 &strip, int GridWidth, int GridHeight)
   _startColors = (uint32_t*)calloc(numPixels, sizeof(uint32_t));
   _transitionDuration = (double*)calloc(numPixels, sizeof(double));
   _transitionElapsed = (double*)calloc(numPixels, sizeof(double));
+  _logging = false;
 }
 
 LEDFader::~LEDFader()
@@ -30,17 +31,45 @@ int LEDFader::pixelFromCoords(int x, int y)
   int colStart = _gridHeight * mapX;
   
   int pixel = (mapX % 2)==0 ? (colStart + mapY) : (colStart + ( _gridHeight - mapY - 1));
+  if (pixel > 24)
+    Serial.println("ERROR: pixel too large");
+  else if (pixel < 0) {
+    Serial.print("ERROR: pixel ");
+    Serial.print(pixel);
+    Serial.print(" too low at ");
+    Serial.print(x);
+    Serial.print(", ");
+    Serial.println(y);
+  }    
   return pixel;
 }
 
 
 void LEDFader::setPixelColor(int x, int y, uint32_t color, double duration)
 {
+  if (x >= _gridWidth)
+    Serial.println("ERROR: x too large");
+  if (y >= _gridHeight)
+    Serial.println("ERROR: y too large");
+  if (x < 0 || y < 0)
+    Serial.println("ERROR: x or y is negative");
+    
   int pixel = pixelFromCoords(x, y);
   _startColors[pixel] = _strip.getPixelColor(pixel);
+  if (_logging && pixel == 21) {
+    Serial.println("setting pixel 21");
+  }
+  
   _targetColors[pixel] = color;
   _transitionDuration[pixel] = duration * 1000; // convert to millis
   _transitionElapsed[pixel] = 0;
+  
+  if (_logging && x==0 && y == 3) {
+    Serial.print("setting pixel: ");
+    Serial.print(pixel);
+    Serial.print(" to color ");
+    Serial.println(_targetColors[pixel]);
+  }
 }
   
 
@@ -80,6 +109,12 @@ void LEDFader::loop(unsigned long delta)
       }
       else if ((_transitionDuration[pixel] == 0) && (_transitionElapsed[pixel] == 0)) {
         // No duration specified. Jump to target color immediately.
+  if (_logging && x==0 && y == 3) {
+    Serial.print("loop setting pixel: ");
+    Serial.print(pixel);
+    Serial.print(" to color ");
+    Serial.println(_targetColors[pixel]);
+  }
         _strip.setPixelColor(pixel, _targetColors[pixel]);
         _transitionElapsed[pixel] = 1; // so we don't try to set the color here again.
       }

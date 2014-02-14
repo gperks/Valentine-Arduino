@@ -25,6 +25,7 @@ class LEDFader
 
     int gridWidth() const {return _gridWidth; }
     int gridHeight() const {return _gridHeight; }
+    bool _logging;
     
   private:
     Adafruit_WS2801 &_strip;

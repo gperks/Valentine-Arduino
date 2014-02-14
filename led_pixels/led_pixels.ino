@@ -4,6 +4,7 @@
 
 #include "frames.h"
 #include "LEDFader.h"
+#include "Message.h"
 #include "Pause.h"
 #include "Rainbow.h"
 
@@ -41,6 +42,17 @@ double transitionDuration; // in millis
 AnimationEndedCallback transitionCompleteCallback;
 double transitionElapsed; // millis taken by transition so far
 
+
+byte* alphabetFrameFromChar(char letter)
+{
+  if (letter == 32) {
+//    Serial.println("space");
+    return AllDark;
+  }
+  else 
+    return Alphabet[letter - 'A'];
+}
+    
 
 /**
  Transition to a frame of colors.
@@ -123,36 +135,38 @@ struct Animation
 Animation animations[] = {
   // Beating heart
   { animateToBigHeart, 0.2 },
-  { pause, 3 },
-  { animateToSmallHeart, 0.4 },
-  { animateToBigHeart, 0.5},
-  { animateToSmallHeart, 0.4 },
-  { animateToBigHeart, 0.5},
-  { animateToSmallHeart, 0.4 },
-  { animateToBigHeart, 0.5},
+//  { pause, 3 },
+//  { animateToSmallHeart, 0.4 },
+//  { animateToBigHeart, 0.5},
+//  { animateToSmallHeart, 0.4 },
+//  { animateToBigHeart, 0.5},
+//  { animateToSmallHeart, 0.4 },
+//  { animateToBigHeart, 0.5},
+//
+//  { allOffBitByBit, 1 },
+//
+//  // "I <heart> U"
+//  { animateToLetterI, 0.2 },
+//  { pause, 1.5 },
+//  { animateToBigHeart, 0.2},
+//  { pause, 1 },
+//  { animateToLetterU, 0.2 },
+//  { pause, 1.5 },
+//
+//  { allOffRowByRow, 2 },
+//
+//  // Beating heart
+//  { animateToBigHeart, 0.5},
+//  { animateToSmallHeart, 0.4 },
+//  { animateToBigHeart, 0.5},
+//  { animateToSmallHeart, 0.4 },
+//  { animateToBigHeart, 0.5},
+//  { animateToSmallHeart, 0.4 },
+//  { animateToBigHeart, 0.5},
+//  { animateToSmallHeart, 0.4 },
+//  { animateToBigHeart, 0.5},
 
-  { allOffBitByBit, 1 },
-
-  // "I <heart> U"
-  { animateToLetterI, 0.2 },
-  { pause, 1.5 },
-  { animateToBigHeart, 0.2},
-  { pause, 1 },
-  { animateToLetterU, 0.2 },
-  { pause, 1.5 },
-
-  { allOffRowByRow, 2 },
-
-  // Beating heart
-  { animateToBigHeart, 0.5},
-  { animateToSmallHeart, 0.4 },
-  { animateToBigHeart, 0.5},
-  { animateToSmallHeart, 0.4 },
-  { animateToBigHeart, 0.5},
-  { animateToSmallHeart, 0.4 },
-  { animateToBigHeart, 0.5},
-  { animateToSmallHeart, 0.4 },
-  { animateToBigHeart, 0.5},
+  { beMineMessage },
 
   { allOffBitByBit, 2 },
 //  { allOff, 0.5 },
@@ -174,11 +188,10 @@ void setup() {
   // Update LED contents, to start they are all 'off'
   strip.show();
 
-//  Serial.begin(19200);
-//  while (!Serial) {
-//    ; // wait for serial port to connect. Needed for Leonardo only
-//  }
-
+  Serial.begin(19200);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
   animationFrame = 0;
   nextAnimation();
@@ -259,6 +272,12 @@ void allOffRowByRow(double duration, uint32_t param)
 {
   allOffRowByRow(duration);
   pause(duration);
+}
+
+void beMineMessage(double duration, uint32_t param)
+{
+  Message *msg = new Message(Fader, " BE MY VALENTINE");
+  CurrentActor = msg;
 }
 
 //////////////
